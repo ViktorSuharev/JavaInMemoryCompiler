@@ -9,17 +9,14 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Arrays;
+import java.util.List;
 
 public class CompileSourceInMemory {
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     private final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
-    public boolean compile(String name, String code) {
-        JavaFileObject file = new JavaSourceFromString(name, code);
-
-        Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(file);
-        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, null, null, compilationUnits);
+    public boolean compile(List<JavaFileObject> files) {
+        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, null, null, files);
 
         boolean result = task.call();
         if (!result) {
