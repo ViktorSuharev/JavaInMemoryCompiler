@@ -1,5 +1,8 @@
 package com.visu.compiler.java;
 
+import com.visu.compiler.java.core.CompileSourceInMemory;
+import com.visu.compiler.java.core.source.StringJavaFileObject;
+
 import javax.tools.JavaFileObject;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -8,17 +11,20 @@ import java.util.Arrays;
 public class TestClass {
     public void assertBoxCodeCompilation() throws Exception {
         CompileSourceInMemory compiler = new CompileSourceInMemory();
-        JavaFileObject testing = new JavaSourceFromString("Testing", createTestingCode("String"));
-        JavaFileObject animalClass = new JavaSourceFromString("Animal", createAnimalCode());
-        JavaFileObject boxClass = new JavaSourceFromString("Box", createBoxCode());
-        JavaFileObject catClass = new JavaSourceFromString("Cat", createCatCode());
+        JavaFileObject testing = new StringJavaFileObject(TestClass.class.getPackage().getName() + "/Testing", createTestingCode("Cat"));
+//        JavaFileObject boxClass = new StringJavaFileObject(TestClass.class.getPackage().getName() + "/Box", createBoxCode());
+//        JavaFileObject catClass = new StringJavaFileObject(TestClass.class.getPackage().getName() + "/Cat", createCatCode());
+//        JavaFileObject animalClass = new StringJavaFileObject(TestClass.class.getPackage().getName() + "/Animal", createAnimalCode());
 
-        boolean result = compiler.compile(Arrays.asList(
-                testing,
-                animalClass,
-                boxClass,
-                catClass
-        ));
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        System.out.println(classLoader);
+        boolean result = compiler.compile(
+                Arrays.asList(
+                        testing
+//                        boxClass
+                )
+        );
+
         if (result) {
             System.out.println("Compiled successfully");
 //            compiler.run(name);
@@ -28,6 +34,7 @@ public class TestClass {
     private String createTestingCode(String className) {
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
+        out.println("package com.visu.compiler.java;");
         out.println("public class Testing {");
         out.println("  public static void main(String args[]) {");
         out.println("    Box<" + className + "> box = new Box<>();");
@@ -42,6 +49,7 @@ public class TestClass {
     private String createBoxCode() {
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
+        out.println("package com.visu.compiler.java;");
         out.println("public class Box<T extends Animal> {");
         out.println("  private T animal;");
         out.println("  void add(T t) {");

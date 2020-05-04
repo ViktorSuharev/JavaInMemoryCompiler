@@ -1,4 +1,6 @@
-package com.visu.compiler.java;
+package com.visu.compiler.java.core;
+
+import com.visu.compiler.java.core.filemanager.ClassFileManager;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -12,11 +14,17 @@ import java.net.URLClassLoader;
 import java.util.List;
 
 public class CompileSourceInMemory {
-    private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    private final JavaCompiler compiler;
+    private final ClassFileManager fileManager;
     private final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
+    public CompileSourceInMemory() {
+        this.compiler = ToolProvider.getSystemJavaCompiler();
+        this.fileManager = new ClassFileManager(compiler.getStandardFileManager(null, null, null));
+    }
+
     public boolean compile(List<JavaFileObject> files) {
-        JavaCompiler.CompilationTask task = compiler.getTask(null, null, diagnostics, null, null, files);
+        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, files);
 
         boolean result = task.call();
         if (!result) {
